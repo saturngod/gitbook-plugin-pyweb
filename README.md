@@ -1,3 +1,7 @@
+pywebtest-gitbook is a plugin for [gitbook](http://www.gitbook.io) that allow to run python code in the gitbook with python editor. 
+
+For Editor , using [ace](http://ace.c9.io) and [brython](www.brython.info) to run python code on browser. Running brython code are inspired from  [Pierre Quentel](https://groups.google.com/d/msg/brython/xLv55qq-L1s/mcwmI6-pEhcJ)'s answer from google group discussion.
+
 ## Install
 
 ```
