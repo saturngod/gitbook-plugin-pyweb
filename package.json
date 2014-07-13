@@ -1,0 +1,18 @@
+{
+    "name": "pyWebTest-gitbook",
+    "description": "Python Code Editor for gitbook",
+    "main": "index.js",
+    "version": "0.0.1",
+    "engines": {
+        "gitbook": "*"
+    },
+    "homepage": "https://github.com/saturngod/pyWebTest-gitbook",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/saturngod/pyWebTest-gitbook.git"
+    },
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/saturngod/pyWebTest-gitbook/issues"
+    }
+}
