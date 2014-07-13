@@ -1,14 +1,14 @@
 ## Install
 
 ```
-npm install pyWebTest-gitbook
+npm install pywebtest-gitbook
 ```
 
 In your gitbook book.json
 
 ```
 plugin : [
-	"pyWebTest-gitbook"
+	"pywebtest-gitbook"
 	]
 ```
 
