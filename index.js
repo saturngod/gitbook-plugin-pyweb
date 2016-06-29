@@ -27,7 +27,8 @@ module.exports = {
 
         pyweb : {
           process : function(blk) {
-            var filepath = path.dirname(this.ctx.file.path);
+            
+            var filepath = path.dirname(this.ctx.ctx.file.path);
             var file = blk.body;
             var fullpath = filepath + "/"+file.trim();
             fullpath = fs.realpathSync(fullpath);
@@ -60,11 +61,11 @@ module.exports = {
 
        // This is called before the book is generated
        "init": function() {
-           console.log("init!");
+           console.log("Start PyWeb!");
        },
        // This is called after the book generation
         "finish": function() {
-            console.log("finish!");
+            console.log("Finish PyWeb!");
         }
       }//end of hooks
 
