@@ -11,7 +11,8 @@ function makeTagDict(tagName){
         }
 
     dict.__init__ = function(){
-        var $ns=$B.$MakeArgs('pow',arguments,['self'],[],'args','kw')
+        var $ns=$B.args('__init__',1,{self:null},['self'],
+            arguments,{},'args','kw')
         var self = $ns['self']
         var args = $ns['args']
         if(args.length==1){
@@ -38,8 +39,8 @@ function makeTagDict(tagName){
                 // Event binding passed as argument "onclick", "onfocus"...
                 // Better use method bind of DOMNode objects
                 var js = '$B.DOMNodeDict.bind(self,"'
-                js += arg.toLowerCase().substr(2)
-                eval(js+'",function(){'+value+'})')
+                js += arg.toLowerCase().substr(2)+'",function(){eval("'+value+'")})'
+                eval(js)
             }else if(arg.toLowerCase()=="style"){
                 $B.DOMNodeDict.set_style(self,value)
             } else {

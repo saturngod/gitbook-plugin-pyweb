@@ -162,24 +162,7 @@ def asctime(t = None):
     return result
 
 def ctime(timestamp=None):
-    if timestamp is None:
-        timestamp = date().getTime() / 1000.
-    d = date(0)
-    d.setUTCSeconds(timestamp)
-    jan = date(d.getFullYear(), 0, 1)
-    jul = date(d.getFullYear(), 6, 1)
-    dst = int(d.getTimezoneOffset() < max(jan.getTimezoneOffset(), jul.getTimezoneOffset()))
-    d = date(0)
-    d.setUTCSeconds(timestamp + (1 + dst) * 3600)
-    weekdays = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 
-                5: "Fri", 6: "Sat", 0: "Sun"}
-    months = {0:'Jan',1:'Feb',2:'Mar',3:'Apr',4:'May',5:'Jun',
-        6:'Jul',7:'Aug',8:'Sep',9:'Oct',10:'Nov',11:'Dec'}
-    result = "%s %s %2d %02d:%02d:%02d %d" % (weekdays[d.getUTCDay()],
-        months[d.getUTCMonth()], d.getUTCDate(),
-        d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds(), 
-        d.getUTCFullYear())
-    return result
+    return asctime(localtime(timestamp))
 
 def gmtime(secs = None):
     d = date()
@@ -227,9 +210,15 @@ def time():
     return float(date().getTime()/1000)
 
 def sleep(secs):
-    start = date().getTime()
-    while date().getTime() - start < secs * 1000.:
-        pass
+    """Javascript can't block execution for a given time, expect by an
+    infinite loop that freezes the browser. It's better to raise an
+    exception"""
+    #start = date().getTime()
+    #while date().getTime() - start < secs * 1000.:
+    #    pass
+    raise NotImplementedError("Blocking functions like time.sleep() are not "
+        "supported in the browser. Use functions in module browser.timer "
+        "instead.")
 
 def strftime(_format,t = None):
     
@@ -281,7 +270,7 @@ def strftime(_format,t = None):
     res = res.replace("%b",abb_months[int(mm)-1])
     res = res.replace("%B",full_months[int(mm)-1])
     res = res.replace("%j", DoY)
-    res = res.replace("%w", w)
+    res = res.replace("%w", str(w))
     res = res.replace("%W", W)
     res = res.replace("%x", mm+'/'+dd+'/'+yy)
     res = res.replace("%X", HH24+':'+MM+':'+SS)

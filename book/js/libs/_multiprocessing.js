@@ -74,7 +74,7 @@ $ProcessDict.terminate = function(self){
 function Process(){
     //arguments group=None, target=None, name=None, args=(), kwargs=()
 
-    var $ns=$B.$MakeArgs('Process',arguments,[],[],null,'kw')
+    var $ns=$B.args('Process',0,{},[],arguments,{},null,'kw')
     var kw=$ns['kw']
 
     var target=_b_.dict.$dict.get($ns['kw'],'target',None)
@@ -109,11 +109,11 @@ $PoolDict.__str__ = $PoolDict.toString = $PoolDict.__repr__=function(self){
    return '<object Pool>'
 }
 
-$PoolDict.map = function(self){
-   var args = []
-   for(var i=1, _len_i = arguments.length; i < _len_i;i++) args.push(arguments[i])
+$PoolDict.map = function(){
 
-   var $ns=$B.$MakeArgs('Pool.map',args,['func', 'fargs'],[],'args','kw')
+   var $ns=$B.args('Pool.map', 3,
+       {self:null, func:null, fargs:null}, ['self', 'func', 'fargs'],
+       arguments,{},'args','kw')
    var func=$ns['func']
    var fargs=$ns['fargs']
 
@@ -128,14 +128,9 @@ $PoolDict.map = function(self){
        _workers[i] = new Worker('/src/web_workers/multiprocessing.js')
        var arg
 
-       try{ 
-          arg=getattr(fargs, '__next__')()
-       } catch(err) {
-          if (err.__name__ == 'StopIteration') {
-             $B.$pop_exc()
-          } else {
-             throw err
-          }
+       try{arg=getattr(fargs, '__next__')()} 
+       catch(err) {
+          if (err.__name__ != 'StopIteration') throw err
        }
        console.log(arg)
        _workers[i].finished=false
@@ -154,18 +149,17 @@ $PoolDict.map = function(self){
                _pos++
            } catch(err) {
                if (err.__name__ != 'StopIteration') throw err
-               $B.$pop_exc()
                this.finished=true
            }
        }, false);
    }
 }
 
-$PoolDict.apply_async = function(self){
-   var args = []
-   for(var i=1, _len_i = arguments.length; i < _len_i;i++){args.push(arguments[i])}
+$PoolDict.apply_async = function(){
 
-   var $ns=$B.$MakeArgs('apply_async',args,['func', 'fargs'],[],'args','kw')
+   var $ns=$B.$MakeArgs('apply_async', 3, 
+       {self:null, func:null, fargs:null}, ['self', 'func', 'fargs'],
+       arguments,{},'args','kw')
    var func=$ns['func']
    var fargs=$ns['fargs']
 
@@ -185,14 +179,9 @@ $PoolDict.apply_async = function(self){
        _workers[i] = new Worker('/src/web_workers/multiprocessing.js')
        var arg
 
-       try{ 
-          arg=getattr(fargs, '__next__')()
-       } catch(err) {
-          if (err.__name__ == 'StopIteration') {
-             $B.$pop_exc()
-          } else {
-             throw err
-          }
+       try{arg=getattr(fargs, '__next__')()} 
+       catch(err) {
+          if (err.__name__ != 'StopIteration') throw err
        }
        //console.log(arg)
        //_workers[i].finished=false
@@ -211,7 +200,6 @@ $PoolDict.apply_async = function(self){
                _pos++
            } catch(err) {
                if (err.__name__ != 'StopIteration') throw err
-               $B.$pop_exc()
                this.finished=true
            }
        }, false);
@@ -224,7 +212,8 @@ $PoolDict.apply_async = function(self){
 function Pool(){
     console.log("pool")
     console.log(arguments)
-    var $ns=$B.$MakeArgs('Pool',arguments,[],['processes'],'args','kw')
+    var $ns=$B.args('Pool',1,
+        {processes:null},['processes'],arguments,{},'args','kw')
     //var kw=$ns['kw']
 
     var processes=$ns['processes']

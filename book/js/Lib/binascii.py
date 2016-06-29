@@ -152,10 +152,10 @@ def a2b_base64(s):
     def next_valid_char(s, pos):
         for i in range(pos + 1, len(s)):
             c = s[i]
-            if c < '\x7f':
+            if c < 0x7f:
                 try:
-                    table_a2b_base64[c]
-                    return c
+                    table_a2b_base64[chr(c)]
+                    return chr(c)
                 except KeyError:
                     pass
         return None
@@ -221,17 +221,16 @@ def b2a_base64(s):
     if final_length == 0:
         snippet = ''
     elif final_length == 1:
-        a = ord(final[0])
+        a = final[0]
         snippet = table_b2a_base64[(a >> 2 ) & 0x3F] + \
                   table_b2a_base64[(a << 4 ) & 0x3F] + '=='
     else:
-        a = ord(final[0])
-        b = ord(final[1])
+        a = final[0]
+        b = final[1]
         snippet = table_b2a_base64[(a >> 2) & 0x3F] + \
                   table_b2a_base64[((a << 4) | (b >> 4) & 0xF) & 0x3F] + \
                   table_b2a_base64[(b << 2) & 0x3F] + '='
-
-    return bytes(''.join(result) + snippet + '\n',__BRYTHON__.charset)
+    return bytes(''.join(result) + snippet + '\n', __BRYTHON__.charset)
 
 def a2b_qp(s, header=False):
     inp = 0
