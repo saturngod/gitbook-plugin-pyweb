@@ -35,7 +35,13 @@ def encode(*args,**kw):
     a ValueError. Other possible values are 'ignore', 'replace' and
     'xmlcharrefreplace' as well as any other name registered with
     codecs.register_error that can handle ValueErrors."""
-    pass
+    obj = args[0]
+    if len(args)==2:
+        encoding = args[1]
+    else:
+        encoding = 'utf-8'
+    if isinstance(obj, str):
+        return obj.encode(encoding)
 
 def escape_decode(*args,**kw):
     pass
@@ -53,8 +59,14 @@ def lookup(encoding):
     """lookup(encoding) -> CodecInfo    
     Looks up a codec tuple in the Python codec registry and returns
     a CodecInfo object."""
-    print('_codecs lookup',encoding)
-    return encoding
+
+    if encoding in ('utf-8', 'utf_8'):
+       from javascript import console
+       console.log('encoding', encoding)
+       import encodings.utf_8
+       return encodings.utf_8.getregentry()
+
+    LookupError(encoding)
 
 def lookup_error(*args,**kw):
     """lookup_error(errors) -> handler    
@@ -158,4 +170,12 @@ def utf_8_decode(*args,**kw):
     pass
 
 def utf_8_encode(*args,**kw):
-    pass
+    input=args[0]
+    if len(args) == 2:
+       errors = args[1]
+    else:
+       errors=kw.get('errors', 'strict')
+
+    #todo need to deal with errors, but for now assume all is well.
+
+    return (bytes([_f for _f in input], 'utf-8'), len(input))

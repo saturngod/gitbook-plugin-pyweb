@@ -1,62 +1,71 @@
 var fs = require("fs");
 var path =  require('path');
+var editor_count = 0;
 module.exports = {
-    book: {
+    website: {
         assets: "./book",
         js: [
-        "js/brython.js",
         "editor/ace.js",
         "editor/theme-tomorrow_night.js",
         "editor/mode-python.js",
-        "webpyeditor.js"
+        "webpyeditor.js",
+		"js/brython.js"
         ],
-        css: [          
+        css: [
             "pygitbook.css"
-        ]
-      },
-      hooks: {
-        "page:after": function(page) {
-          var filepath = path.dirname(page.path);
-          var content = page.content;
-          var arr = {};
-          var files = content.match(/\[\[\[([^\]]+)\]\]\]/g);
-          for (var i in files) {
-            file = files[i];
-            key = files[i];
-            file = file.replace(/\[\[\[/g,"");
-            file = file.replace(/\]\]\]/g,"");
-            var fullpath = filepath + "/"+file;
-            fullpath = fs.realpathSync(fullpath);
-            var python = fs.readFileSync(fullpath);
-            
-            var template = "<div id='code"+i+"'>";
-            template += python;
-            template +="</div>\n";
-            
-            template +="<script>\n"
-            template +="var editor" + i + "= '';\n";
-             template += "document.addEventListener('DOMContentLoaded', function(){\n";
-            template +="editor" + i + "=  ace.edit('code"+i+"');\n";
-            template += "editor" + i + ".setTheme(\"ace/theme/tomorrow_night\");\n";
-            template +=  "editor" + i + ".getSession().setMode(\"ace/mode/python\");\n";
-            template += "});\n";
-            template +="</script>\n";
-            
-            template +="<input type='button' class='btn' id='run"+i+"' value='run' onclick=\"run_python(editor"+i+",'python_result"+i+"')\"><br/>\n";
-            template +="<textarea id='python_result"+i+"' readonly class='console'></textarea>";
-            
+        ],
+        html: {
+          "body:start": function() {
            
+          },
+          "body:end": function() {
             
-            arr[key] = template;
-          } // end for files loop
-          
-          content = content.replace(/\[\[\[([^\]]+)\]\]\]/g,function ($0, $1){
-            return arr[$0]
-          });
-          
-          page.content = content;
-          
-          return page;
+          }
         }
-      } //end of hooks
+      },
+      blocks: {
+
+        pyweb : {
+          process : function(blk) {
+            var filepath = path.dirname(this.ctx.file.path);
+            var file = blk.body;
+            var fullpath = filepath + "/"+file.trim();
+            fullpath = fs.realpathSync(fullpath);
+
+            //got the python code
+            var python = fs.readFileSync(fullpath);
+            python = String(python).replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+            var html_code = '<div id="code'+editor_count+'" class="codeEditor" data-editor = "editor'+editor_count+'">'+python+'</div>';
+
+            html_code += "<script> var editor"+editor_count+"='';</script>";
+
+            html_code += "<input type='button' class='btn pyBtn' id='run0' value='run' onclick=\"run_python(editor"+editor_count+",'python_result"+editor_count+"')\"><br/>";
+
+            html_code += "<textarea id='python_result"+editor_count+"' readonly class='console'></textarea>";
+
+
+            editor_count++;
+
+            return html_code;
+
+          }
+        }
+      }, //end of blocks
+      hooks: {
+       // For all the hooks, this represent the current generator
+
+       // This is called before the book is generated
+       "init": function() {
+           console.log("init!");
+       },
+       // This is called after the book generation
+        "finish": function() {
+            console.log("finish!");
+        }
+      }//end of hooks
+
     } //end of exports

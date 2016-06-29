@@ -1,30 +1,25 @@
 // ajax
 var $module = (function($B){
 
-var __builtins__ = $B.builtins
+eval($B.InjectBuiltins())
 
-for(var $py_builtin in __builtins__){eval("var "+$py_builtin+"=__builtins__[$py_builtin]")}
-
-var $XMLHttpDict = {
-    __class__:$B.$type,
-    __name__:'XMLHttp'
-}
+var $XMLHttpDict = {__class__:$B.$type,__name__:'XMLHttp'}
 
 $XMLHttpDict.__getattribute__ = function(self,attr){
     if(['headers','text','xml'].indexOf(attr)>-1){
         return $XMLHttpDict[attr](self)
     }
-    return __builtins__.object.$dict.__getattribute__(self,attr)
+    return _b_.object.$dict.__getattribute__(self,attr)
 }
 
-$XMLHttpDict.__mro__ = [$XMLHttpDict, __builtins__.object.$dict]
+$XMLHttpDict.__mro__ = [$XMLHttpDict, _b_.object.$dict]
 
 $XMLHttpDict.__repr__ = function(self){return '<object XMLHttp>'}
 
 $XMLHttpDict.__str__ = $XMLHttpDict.toString = $XMLHttpDict.__repr__
 
 $XMLHttpDict.text = function(self){return self.responseText}
-    
+
 $XMLHttpDict.xml = function(self){return $DomObject(self.responseXML)}
 
 $XMLHttpDict.headers = function(self){
@@ -36,16 +31,11 @@ $XMLHttpDict.get_header = function(){
     return function(header){ return reqobj.getResponseHeader(header) }
 }
 
-var $AjaxDict = {
-    __class__:$B.$type,
-    __name__:'ajax'
-}
+var $AjaxDict = {__class__:$B.$type,__name__:'ajax'}
 
-$AjaxDict.__mro__ = [$AjaxDict, __builtins__.object.$dict]
+$AjaxDict.__mro__ = [$AjaxDict, _b_.object.$dict]
 
-$AjaxDict.__repr__ = function(self){
-    return '<object Ajax>'
-}
+$AjaxDict.__repr__ = function(self){return '<object Ajax>'}
 
 $AjaxDict.__str__ = $AjaxDict.toString = $AjaxDict.__repr__
 
@@ -59,18 +49,28 @@ $AjaxDict.open = function(self,method,url,async){
 }
 
 $AjaxDict.send = function(self,params){
-    // params is a Python dictionary
+    // params can be Python dictionary or string
     var res = ''
-    if(!params || params.$keys.length==0){self.$xmlhttp.send();return}
-    else if(isinstance(params,str)){
+    if(!params){
+        self.$xmlhttp.send();
+        return;
+    }else if(isinstance(params,str)){
         res = params
     }else if(isinstance(params,dict)){
-        for(i=0;i<params.$keys.length;i++){
-            res +=encodeURIComponent(str(params.$keys[i]))+'='+encodeURIComponent(str(params.$values[i]))+'&'
+        var items = _b_.list(_b_.dict.$dict.items(params))
+        for(var i=0, _len_i = items.length; i < _len_i;i++){
+            var key = encodeURIComponent(str(items[i][0]));
+            if (isinstance(items[i][1],list)) {
+                for (j = 0; j < items[i][1].length; j++) {
+                    res += key +'=' + encodeURIComponent(str(items[i][1][j])) + '&'
+                }
+            } else {
+                res += key + '=' + encodeURIComponent(str(items[i][1])) + '&'
+            }
         }
         res = res.substr(0,res.length-1)
     }else{
-        throw TypeError("send() argument must be string or dictonary, not '"+str(params.__class__)+"'")
+        throw _b_.TypeError("send() argument must be string or dictionary, not '"+str(params.__class__)+"'")
     }
     self.$xmlhttp.send(res)
 }
@@ -81,8 +81,8 @@ $AjaxDict.set_header = function(self,key,value){
 
 $AjaxDict.set_timeout = function(self,seconds,func){
     self.$xmlhttp.$requestTimer = setTimeout(
-        function() {self.$xmlhttp.abort();func()}, 
-        seconds*1000); 
+        function() {self.$xmlhttp.abort();func()},
+        seconds*1000);
 }
 
 function ajax(){
@@ -98,7 +98,7 @@ function ajax(){
     }
     $xmlhttp.$requestTimer = null
     $xmlhttp.__class__ = $XMLHttpDict
-    
+
     $xmlhttp.onreadystatechange = function(){
         // here, "this" refers to $xmlhttp
         var state = this.readyState

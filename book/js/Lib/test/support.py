@@ -32,25 +32,31 @@ try:
 except ImportError:
     _thread = None
     threading = None
-try:
-    import multiprocessing.process
-except ImportError:
-    multiprocessing = None
 
-try:
-    import zlib
-except ImportError:
-    zlib = None
+# BCE fixme brython.
+# causes an undefined is not a function error.  Will track down later.
+#try:
+#    import multiprocessing.process
+#except ImportError:
+#    multiprocessing = None
+multiprocessing = None
 
-try:
-    import bz2
-except ImportError:
-    bz2 = None
+#try:
+#    import zlib
+#except ImportError:
+#    zlib = None
 
-try:
-    import lzma
-except ImportError:
-    lzma = None
+#try:
+#    import bz2
+#except ImportError:
+#    bz2 = None
+
+#try:
+#    import lzma
+#except ImportError:
+#    lzma = None
+
+zlib=bz2=lzma=None
 
 __all__ = [
     "Error", "TestFailed", "ResourceDenied", "import_module", "verbose",
@@ -182,12 +188,15 @@ def import_fresh_module(name, fresh=(), blocked=(), deprecated=False):
                     names_to_remove.append(blocked_name)
             fresh_module = importlib.import_module(name)
         except ImportError:
+            console.log('ImportError')
             fresh_module = None
         finally:
             for orig_name, module in orig_modules.items():
                 sys.modules[orig_name] = module
             for name_to_remove in names_to_remove:
                 del sys.modules[name_to_remove]
+        from javascript import console
+        console.log("fresh_module", fresh_module)
         return fresh_module
 
 

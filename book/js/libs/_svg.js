@@ -1,55 +1,119 @@
+// creation of an HTML element
 var $module = (function($B){
 
-var __builtins__ = $B.builtins
+var _b_ = $B.builtins
 var $TagSumDict = $B.$TagSum.$dict
 
-for(var $py_builtin in __builtins__){eval("var "+$py_builtin+"=__builtins__[$py_builtin]")}
+var $s=[]
+for(var $b in _b_) $s.push('var ' + $b +'=_b_["'+$b+'"]')
+eval($s.join(';'))
 
 var $svgNS = "http://www.w3.org/2000/svg"
 var $xlinkNS = "http://www.w3.org/1999/xlink"
 
-function $SVGTag(tag_name,args){
-    // represents an SVG tag
-    var $i = null
-    var $obj = this
-    var obj = $B.$DOMNode(document.createElementNS($svgNS,tag_name))
-    if(args!=undefined && args.length>0){
-        var $start=0,$first=args[0]
-        // if first argument is not a keyword, it's the tag content
-        if($first.__class__!==$B.$KwDict){
-            $start = 1
-            if(isinstance($first,[str,int,float])){
-                obj.elt.appendChild(document.createTextNode(str($first)))
-            } else if($first.__class__===$TagSumDict){
-                for($i=0;$i<$first.children.length;$i++){
-                    obj.elt.appendChild($first.children[$i])
-                }
-            } else {
-                try{obj.elt.appendChild($first.elt)}
-                catch(err){$raise('ValueError','wrong element '+$first)}
+function makeTagDict(tagName){
+    // return the dictionary for the class associated with tagName
+    var dict = {__class__:$B.$type,
+        __name__:tagName
+        }
+
+    dict.__getattribute__ = function(self, attr){
+        if(self.elt.hasAttributeNS(null, attr)){
+            return self.elt.getAttributeNS(null,attr)
+        }
+        if(dict[attr]!==undefined){
+            return function(){
+                var args = [self].concat(Array.prototype.slice.call(arguments))
+                return dict[attr].apply(null, args)
             }
         }
+        return $B.DOMNodeDict.__getattribute__(self, attr)        
+    }
+
+    dict.__init__ = function(){
+        var $ns=$B.$MakeArgs('pow',arguments,['self'],[],'args','kw')
+        var self = $ns['self']
+        var args = $ns['args']
+        if(args.length==1){
+            var first=args[0]
+            if(isinstance(first,[str,int,float])){
+                self.elt.appendChild(document.createTextNode(str(first)))
+            } else if(first.__class__===$TagSumDict){
+                for(var i=0, _len_i = first.children.length; i < _len_i;i++){
+                    self.elt.appendChild(first.children[i].elt)
+                }
+            } else { // argument is another DOMNode instance
+                try{self.elt.appendChild(first.elt)}
+                catch(err){throw ValueError('wrong element '+first)}
+            }
+        }
+
         // attributes
-        for($i=$start;$i<args.length;$i++){
+        var items = _b_.list(_b_.dict.$dict.items($ns['kw']))
+        for(var i=0, _len_i = items.length; i < _len_i;i++){
             // keyword arguments
-            var $arg = args[$i]
-            if($arg && $arg.__class__===$B.$KwDict){
-                if($arg.name.toLowerCase().substr(0,2)=="on"){ // events
-                    eval('$B.DOMNode.bind(obj,"'+$arg.name.toLowerCase().substr(2)+'",function(){'+$arg.value+'})')
-                }else if($arg.name.toLowerCase()=="style"){
-                    $B.DOMNode.set_style(obj,$arg.value)
-                }else if($arg.name.toLowerCase().indexOf("href") !== -1){ // xlink:href
-                    obj.elt.setAttributeNS( "http://www.w3.org/1999/xlink","href",$arg.value)
-                } else {
-                    if($arg.value!==false){
-                        // option.selected=false sets it to true :-)
-                        obj.elt.setAttributeNS(null,$arg.name.replace('_','-'),$arg.value)
+            var arg = items[i][0]
+            var value = items[i][1]
+            if(arg.toLowerCase().substr(0,2)==="on"){ 
+                // Event binding passed as argument "onclick", "onfocus"...
+                // Better use method bind of DOMNode objects
+                var js = '$B.DOMNodeDict.bind(self,"'
+                js += arg.toLowerCase().substr(2)
+                eval(js+'",function(){'+value+'})')
+            }else if(arg.toLowerCase()=="style"){
+                $B.DOMNodeDict.set_style(self,value)
+            }else if(arg.toLowerCase().indexOf("href") !== -1){ // xlink:href
+                self.elt.setAttributeNS( "http://www.w3.org/1999/xlink","href",value)
+            } else {
+                if(value!==false){
+                    // option.selected=false sets it to true :-)
+                    try{
+                        arg = arg.toLowerCase().replace('_','-')
+                        self.elt.setAttributeNS(null,arg,value)
+                    }catch(err){
+                        throw ValueError("can't set attribute "+arg)
                     }
                 }
             }
         }
     }
-    return obj
+
+    dict.__mro__ = [dict,$B.DOMNodeDict,$B.builtins.object.$dict]
+
+    dict.__new__ = function(cls){
+        var res = $B.DOMNode(document.createElementNS($svgNS,tagName))
+        res.__class__ = cls.$dict
+        return res
+    }
+    
+    dict.__setattr__ = function(self, key, value){
+        if(self.elt.hasAttributeNS(null, key)){
+            self.elt.setAttributeNS(null,key,value)
+        }else{
+            $B.DOMNodeDict.__setattr__(self, key, value)
+        }
+    }
+
+    return dict
+}
+
+
+// the classes used for tag sums, $TagSum and $TagSumClass 
+// are defined in py_dom.js
+
+function makeFactory(tagName){
+    var factory = function(){
+        var res = $B.DOMNode(document.createElementNS($svgNS,tagName))
+        res.__class__ = dicts[tagName]
+        // apply __init__
+        var args = [res]
+        for(var i=0, _len_i = arguments.length; i < _len_i;i++){args.push(arguments[i])}
+        dicts[tagName].__init__.apply(null,args)
+        return res
+    }
+    factory.__class__=$B.$factory
+    factory.$dict = dicts[tagName]
+    return factory
 }
 
 // SVG
@@ -90,14 +154,14 @@ var $svg_tags = ['a',
 'tspan',
 'use']
 
-var $svg = function(){return $SVGTag('X',arguments)}
-$svg += '' // source code
-
+// create classes
 var obj = new Object()
-for(var i=0;i<$svg_tags.length;i++){
+var dicts = {}
+for(var i=0, _len_i = $svg_tags.length; i < _len_i;i++){
     var tag = $svg_tags[i]
-    eval('obj.'+tag+'='+$svg.replace('X',tag))
+    dicts[tag]=makeTagDict(tag)
+    obj[tag] = makeFactory(tag)
+    dicts[tag].$factory = obj[tag]
 }
-obj.__getattr__ = function(attr){return this[attr]}
 return obj
 })(__BRYTHON__)

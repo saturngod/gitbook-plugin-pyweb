@@ -1,8 +1,10 @@
-var $module = (function($B){
+var $module=(function($B){
 
-    var __builtins__ = $B.builtins
+    var _b_ = $B.builtins
+    var $s=[]
+    for(var $b in _b_) $s.push('var ' + $b +'=_b_["'+$b+'"]')
+    eval($s.join(';'))
 
-    for(var $py_builtin in __builtins__){eval("var "+$py_builtin+"=__builtins__[$py_builtin]")}
     var JSObject = $B.JSObject
 
     var obj = {__class__:$module,
@@ -16,8 +18,8 @@ var $module = (function($B){
     obj.U = obj.UNICODE = 32
     obj.X = obj.VERBOSE = 64
     obj._is_valid = function(pattern) {
-        if (__BRYTHON__.$options.re=='pyre') return false  //force use of python's re module
-        if (__BRYTHON__.$options.re=='jsre') return true   //force use of brythons re module
+        if ($B.$options.re=='pyre') return false  //force use of python's re module
+        if ($B.$options.re=='jsre') return true   //force use of brythons re module
         // FIXME: Improve
 
         if (!isinstance(pattern, str)) {
@@ -39,12 +41,12 @@ var $module = (function($B){
         // look for things javascript does not support
         // check for name capturing group
         var mylist=['?P=', '?P<', '(?#', '(?<=', '(?<!', '(?(']
-        for(var i=0; i < mylist.length; i++) {
+        for(var i=0, _len_i = mylist.length; i < _len_i; i++) {
            if (pattern.indexOf(mylist[i]) > -1) return false
         }
 
         var re_list=['\{,\d+\}']
-        for(var i=0; i < re_list.length; i++) {
+        for(var i=0, _len_i = re_list.length; i < _len_i; i++) {
            var _re=new RegExp(re_list[i])
            if (_re.test(pattern)) return false
         }
@@ -86,7 +88,7 @@ var $module = (function($B){
         // string that may have regular expression metacharacters in it.
         var res = ''
         var ok = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
-        for(var i=0;i<string.length;i++){
+        for(var i=0, _len_i = string.length; i < _len_i;i++){
             if(ok.search(string.charAt(i))>-1){res += string.charAt(i)}
         }
         return res
@@ -106,26 +108,25 @@ var $module = (function($B){
         return jsmatch
     }
     obj.finditer = function(pattern,string,flags){
-        var $ns=$B.$MakeArgs('re.finditer',arguments,['pattern','string'],[],'args','kw') ,
-            args = $ns['args'] ,
+        var $ns=$B.$MakeArgs('re.finditer',arguments,['pattern','string'],[],'args','kw'),
+            args = $ns['args'],
             _flags = 0;
         if(args.length>0){var flags=args[0]}
         else{var _flags = getattr($ns['kw'], 'get')('flags',0)}
         
         var flags = normflags();
         flags += 'gm'
-        var jsp = new RegExp(pattern,flags) ,
+        var jsp = new RegExp(pattern,flags),
             jsmatch = string.match(jsp);
         if(jsmatch===null){return []}
         
         var _list=[]
-        console.log('jsmatch.length', jsmatch.length)
-        for (var j=0; j < jsmatch.length; j++) {
-            var mo = new Object()
+        for (var j=0, _len_j = jsmatch.length; j < _len_j; j++) {
+            var mo = {}
             mo._match=jsmatch[j]
             mo.group = function(){
                var res = []
-               for(var i=0;i<arguments.length;i++){
+               for(var i=0, _len_i = arguments.length; i < _len_i;i++){
                    if(jsmatch[arguments[i]]===undefined){res.push(None)}
                    else{res.push(jsmatch[arguments[i]])}
                }
@@ -135,7 +136,7 @@ var $module = (function($B){
             mo.groups = function(_default){
                if(_default===undefined){_default=None}
                var res = []
-               for(var i=1;i<jsmatch.length;i++){
+               for(var i=1, _len_i = jsmatch.length; i < _len_i;i++){
                   if(jsmatch[i]===undefined){res.push(_default)}
                   else{res.push(jsmatch[i])}
                }
@@ -160,7 +161,7 @@ var $module = (function($B){
         var mo = new Object()
         mo.group = function(){
             var res = []
-            for(var i=0;i<arguments.length;i++){
+            for(var i=0, _len_i = arguments.length; i < _len_i;i++){
                 if(jsmatch[arguments[i]]===undefined){res.push(None)}
                 else{res.push(jsmatch[arguments[i]])}
             }
@@ -170,7 +171,7 @@ var $module = (function($B){
         mo.groups = function(_default){
             if(_default===undefined){_default=None}
             var res = []
-            for(var i=1;i<jsmatch.length;i++){
+            for(var i=1, _len_i = jsmatch.length; i < _len_i;i++){
                 if(jsmatch[i]===undefined){res.push(_default)}
                 else{res.push(jsmatch[i])}
             }
@@ -185,8 +186,8 @@ var $module = (function($B){
         var $ns=$B.$MakeArgs('re.search',arguments,['pattern','repl','string'],[],'args','kw')
         for($var in $ns){eval("var "+$var+"=$ns[$var]")}
         var args = $ns['args']
-        var count = __builtins__.dict.$dict.get($ns['kw'],'count',0)
-        var flags = __builtins__.dict.$dict.get($ns['kw'],'flags','')
+        var count = _b_.dict.$dict.get($ns['kw'],'count',0)
+        var flags = _b_.dict.$dict.get($ns['kw'],'flags','')
         if(args.length>0){var count=args[0]}
         if(args.length>1){var flags=args[1]}
         flags = normflags(flags);
@@ -208,11 +209,11 @@ var $module = (function($B){
                 mo.start = function(){return start}
                 mo.end = function(){return end}
                 groups = []
-                for(var i=1;i<arguments.length-2;i++){groups.push(arguments[i])}
+                for(var i=1, _len_i = arguments.length-2; i < _len_i;i++){groups.push(arguments[i])}
                 mo.groups = function(_default){
                     if(_default===undefined){_default=None}
                     var res = []
-                    for(var i=0;i<groups.length;i++){
+                    for(var i=0, _len_i = groups.length; i < _len_i;i++){
                         if(groups[i]===undefined){res.push(_default)}
                         else{res.push(groups[i])}
                     }
@@ -232,7 +233,7 @@ var $module = (function($B){
             var pattern = arguments[0]
             if(pattern.charAt(0)!=='^'){pattern = '^'+pattern}
             var args = [pattern]
-            for(var i=1;i<arguments.length;i++){args.push(arguments[i])}
+            for(var i=1, _len_i = arguments.length; i < _len_i;i++){args.push(arguments[i])}
             return search_func.apply(null,args)
         }
     })(obj.search)
