@@ -28,11 +28,15 @@ module.exports = {
         pyweb : {
           process : function(blk) {
             
-            var filepath = path.dirname(this.ctx.ctx.file.path);
+            
+            
+            var filepath = path.normalize(path.dirname(this.ctx.ctx.options.root) + "/" + path.dirname(this.ctx.ctx.file.path));
             var file = blk.body;
+            file = file.replace(/\\/g,"");
             var fullpath = filepath + "/"+file.trim();
-            fullpath = fs.realpathSync(fullpath);
-
+            
+            fullpath = path.normalize(fullpath);
+            
             //got the python code
             var python = fs.readFileSync(fullpath);
             python = String(python).replace(/&/g, '&amp;')
