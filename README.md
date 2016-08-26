@@ -13,10 +13,7 @@ In your gitbook book.json
 ```
 "plugin" : [
 	"pywebtest-gitbook"
-	],
- "pluginsConfig" : {
-      "brythonPath" : "http://brython-comquas.rhcloud.com/brython.js"
-    }
+	]
 ```
 
 
