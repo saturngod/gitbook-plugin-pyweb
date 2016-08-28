@@ -27,12 +27,12 @@ You can add python code like following
 ```
 Hello World
 
-[[[helloworld.py]]]
+{% pyweb %}helloworld.py{% endpyweb %}
 
 
 Bubbler Sort
 
-[[[bubble.py]]]
+{% pyweb %}bubble.py{% endpyweb %}
 ```
 
 You need to put your python file path between **[[[** and **]]]**
@@ -48,7 +48,7 @@ In file.md , you can call like
 ```
 This is file.md
 
-[[[code/helloworld.py]]
+{% pyweb %}code/helloworld.py{% endpyweb %}
 
 ```
 
