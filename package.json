@@ -2,7 +2,7 @@
     "name": "gitbook-plugin-pyweb",
     "description": "Python Code Editor for gitbook",
     "main": "index.js",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "engines": {
         "gitbook": "*"
     },
@@ -15,14 +15,14 @@
     "bugs": {
         "url": "https://github.com/saturngod/gitbook-plugin-pyweb/issues"
     },
-	"author": {
-		"name": "saturngod"
-	},
+    "author": {
+        "name": "saturngod"
+    },
     "keywords": [
-      "gitbookio",
-      "gitbook",
-      "python",
-      "plugin"
+        "gitbookio",
+        "gitbook",
+        "python",
+        "plugin"
     ],
-	"readmeFilename": "README.md"
+    "readmeFilename": "README.md"
 }

@@ -9,7 +9,8 @@ module.exports = {
         "editor/theme-tomorrow_night.js",
         "editor/mode-python.js",
         "webpyeditor.js",
-		"js/brython.js"
+		    "js/brython.js",
+        "js/brython_stdlib.js"
         ],
         css: [
             "pygitbook.css"
